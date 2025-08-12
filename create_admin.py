@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 
 with app.app_context():
     # Check if the admin user already exists
-    admin_user = User.query.filter_by(email="ahmadabdulbasit1@gmail.com").first()
+    admin_user = User.query.filter_by(email="admin1@gmail.com").first()
     if admin_user:
         # Update existing admin user
         admin_user.username = "admin"
@@ -16,7 +16,7 @@ with app.app_context():
         # Create a new admin user
         admin_user = User(
             username="admin",
-            email="ahmadabdulbasit1@gmail.com",
+            email="admin1@gmail.com",
             role="admin",
             is_admin=True
         )
