@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}My Orders{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fa-solid fa-box"></i> Orders for My Products</h2>
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th>Buyer</th>
+                    <th>Status</th>
+                    <th>Ordered At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.product.name }}</td>
+                    <td>{{ order.buyer.username }}</td>
+                    <td>
+                        {% if order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif order.status == 'accepted' %}
+                            <span class="badge bg-success">Accepted</span>
+                        {% elif order.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if order.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('accept_order', order_id=order.id) }}" style="display:inline-block;">
+                            <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-check"></i> Accept</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('reject_order', order_id=order.id) }}" style="display:inline-block;">
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-xmark"></i> Reject</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">No action</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-center">No orders for your products yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

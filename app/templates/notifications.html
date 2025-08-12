@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Notifications</h2>
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    {% if notifications %}
+      <ul class="list-group list-group-flush">
+        {% for notif in notifications %}
+          <li class="list-group-item d-flex justify-content-between align-items-center {% if not notif.is_read %}fw-bold bg-light{% endif %}">
+            <div>
+              <span>{{ notif.message }}
+                {% if notif.comment_id and comments_dict[notif.comment_id] is defined %}
+                  <a href="{{ url_for('tutorial_detail', tutorial_id=comments_dict[notif.comment_id].tutorial_id) }}#comment-{{ notif.comment_id }}" class="btn btn-info btn-sm ms-2" style="color:#fff; font-weight:500; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); padding:0.25rem 1.1rem; transition:background 0.2s, box-shadow 0.2s;">
+                    <i class="fa-solid fa-comment-dots"></i> View Comment
+                  </a>
+                {% endif %}
+                {% if 'placed an order for your product' in notif.message %}
+                  <a href="{{ url_for('seller_orders') }}" class="btn btn-gradient btn-sm ms-2" style="background: linear-gradient(90deg, #0d6efd 0%, #6f42c1 100%); color: #fff; font-weight: 500; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 0.25rem 1.1rem; transition: background 0.2s, box-shadow 0.2s;">
+                    <i class="fa-solid fa-box"></i> My Orders
+                  </a>
+                {% endif %}
+              </span><br>
+              <small class="text-muted"><i class="fa-regular fa-clock"></i> {{ notif.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+            <div>
+              {% if notif.is_read %}
+                <form method="post" action="{{ url_for('mark_unread', notif_id=notif.id) }}" style="display:inline;">
+                  <button class="btn btn-sm btn-warning" title="Mark as unread"><i class="fa-regular fa-envelope"></i></button>
+                </form>
+              {% else %}
+                <form method="post" action="{{ url_for('mark_read', notif_id=notif.id) }}" style="display:inline;">
+                  <button class="btn btn-sm btn-success" title="Mark as read"><i class="fa-regular fa-envelope-open"></i></button>
+                </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('delete_notification', notif_id=notif.id) }}" style="display:inline;">
+                <button class="btn btn-sm btn-danger" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="alert alert-info">No notifications.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

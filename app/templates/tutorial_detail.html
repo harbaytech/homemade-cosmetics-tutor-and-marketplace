@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tutorial.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg rounded-4 border-0 mb-4" style="background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-3" style="font-weight: 700;">
+                        <i class="fas fa-book-open me-2 text-primary"></i>{{ tutorial.title }}
+                    </h2>
+                    <div class="d-flex flex-wrap justify-content-center gap-3 mb-3">
+                        <span class="badge bg-gradient-primary text-dark rounded-pill px-3 py-2">
+                            <i class="fas fa-tags me-1"></i> {{ tutorial.category }}
+                        </span>
+                        <span class="badge bg-gradient-success text-dark rounded-pill px-3 py-2">
+                            <i class="fas fa-user me-1"></i> {{ tutorial.uploader.username }}
+                        </span>
+                    </div>
+                    <p class="mb-4"><i class="fas fa-align-left me-2 text-secondary"></i><strong>Description:</strong> {{ tutorial.description }}</p>
+
+                    <!-- Tutorial Content Display -->
+                    {% if tutorial.youtube_link %}
+                        <div class="ratio ratio-16x9 mb-4 rounded-3 overflow-hidden shadow-sm border border-2 border-primary">
+                            <iframe src="https://www.youtube.com/embed/{{ tutorial.youtube_link | youtube_id }}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    {% elif tutorial.file_path %}
+                        {% set ext = tutorial.file_path.rsplit('.', 1)[-1].lower() %}
+                        {% if ext in ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'] %}
+                            <video class="w-100 mb-4 rounded-3 shadow-sm border border-2 border-primary" controls>
+                                <source src="{{ url_for('static', filename='tutorials/' + tutorial.file_path) }}" type="video/{{ ext }}">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% elif ext == 'pdf' %}
+                            <a href="{{ url_for('static', filename='tutorials/' + tutorial.file_path) }}" class="btn btn-success mb-3 rounded-pill">
+                                <i class="fas fa-file-pdf me-1"></i>Download PDF
+                            </a>
+                            <iframe src="{{ url_for('static', filename='tutorials/' + tutorial.file_path) }}" width="100%" height="600px" class="rounded-3 border border-2 border-primary shadow-sm"></iframe>
+                        {% else %}
+                            <a href="{{ url_for('static', filename='tutorials/' + tutorial.file_path) }}" class="btn btn-success mb-3 rounded-pill">
+                                <i class="fas fa-file-download me-1"></i>Download File
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Comment Section -->
+            <div class="card shadow rounded-4 border-0 mb-4">
+                <div class="card-body p-4">
+                    <h3 class="mb-4"><i class="fas fa-comments me-2 text-info"></i>Comments</h3>
+                    <form method="POST" action="{{ url_for('tutorial_detail', tutorial_id=tutorial.id) }}" class="mb-4">
+                        <div class="mb-3">
+                            <textarea name="comment" class="form-control rounded-3" rows="3" placeholder="Add a comment..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            <i class="fas fa-paper-plane me-1"></i>Submit
+                        </button>
+                    </form>
+                    <div>
+                        <h4 class="mb-3"><i class="fas fa-list me-2 text-secondary"></i>All Comments</h4>
+                        {% for comment in comments %}
+                            <div class="mb-4 p-3 rounded-3 bg-light border border-1 shadow-sm">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-user-circle fa-lg me-2 text-primary"></i>
+                                    <strong>{{ comment.user.username }}</strong>
+                                </div>
+                                <p class="mb-2">{{ comment.text }}</p>
+                                <form method="POST" action="{{ url_for('add_reply', comment_id=comment.id) }}" class="mb-2">
+                                    <div class="mb-2">
+                                        <textarea name="reply" class="form-control rounded-3" rows="2" placeholder="Reply to this comment..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-sm rounded-pill">
+                                        <i class="fas fa-reply me-1"></i>Reply
+                                    </button>
+                                </form>
+                                {% if current_user.is_authenticated and current_user.is_admin %}
+                                <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill mt-2" onclick="return confirm('Are you sure you want to delete this comment?')">
+                                        <i class="fas fa-trash-alt me-1"></i>Delete Comment
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <!-- Display Replies -->
+                                {% for reply in comment.replies %}
+                                    <div class="ms-4 mt-3 p-2 rounded-3 bg-white border border-1 shadow-sm">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="fas fa-user-circle fa-sm me-1 text-success"></i>
+                                            <strong>{{ reply.user.username }}</strong>
+                                        </div>
+                                        <p class="mb-1">{{ reply.text }}</p>
+                                        {% if current_user.is_authenticated and current_user.is_admin %}
+                                        <form method="POST" action="{{ url_for('delete_comment', comment_id=reply.id) }}" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm rounded-pill mt-1" onclick="return confirm('Are you sure you want to delete this reply?')">
+                                                <i class="fas fa-trash-alt me-1"></i>Delete Reply
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No comments yet. Be the first to comment!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

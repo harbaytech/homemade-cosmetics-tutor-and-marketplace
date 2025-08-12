@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask App{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 60%, #f7d9e3 100%);
+            min-height: 100vh;
+        }
+        .main-container {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(0,0,0,0.11);
+            padding: 2.5rem 2.5rem 2rem 2.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 2.5rem;
+            transition: box-shadow 0.3s, border 0.3s;
+            border: 2px solid #e0e7ff;
+        }
+        .main-container:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.16);
+            border: 2px solid #a5b4fc;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: linear-gradient(90deg, #0d6efd 0%, #6f42c1 100%) !important;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.35rem;
+            letter-spacing: 1px;
+        }
+        .navbar-nav .nav-link {
+            transition: color 0.2s, background 0.2s;
+            font-weight: 500;
+            font-size: 1.08rem;
+        }
+        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+            color: #fff !important;
+            background: #6f42c1;
+            border-radius: 8px;
+        }
+        .dropdown-menu {
+            border-radius: 12px;
+        }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+            object-fit: cover;
+            border: 2px solid #6f42c1;
+        }
+        .btn, .alert {
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #0d6efd 0%, #6f42c1 100%);
+            border: none;
+        }
+        .btn-success {
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+            border: none;
+        }
+        .btn-info {
+            background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
+            border: none;
+            color: #fff;
+        }
+        .btn-warning {
+            background: linear-gradient(90deg, #fbbf24 0%, #f59e42 100%);
+            border: none;
+            color: #fff;
+        }
+        .btn-danger {
+            background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
+            border: none;
+        }
+        .btn:hover {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.13);
+            opacity: 0.95;
+        }
+        .alert {
+            border-radius: 8px;
+        }
+        footer {
+            background: linear-gradient(90deg, #6f42c1 0%, #0d6efd 100%);
+            color: #fff;
+            padding: 1.3rem 0 1.1rem 0;
+            text-align: center;
+            letter-spacing: 0.5px;
+            font-size: 1.08rem;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+        }
+        .notif-animate {
+            animation: notif-bounce 0.5s;
+        }
+        @keyframes notif-bounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.3); }
+            60% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+                <i class="fa-solid fa-flask-vial me-2"></i> Homemade Cosmetics Tutor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ url_for('notifications') }}">
+                                <i class="fa-solid fa-bell"></i> 
+                                {% set unread_count = current_user.notifications|selectattr('is_read', 'equalto', False)|list|length %}
+                                {% if unread_count > 0 %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8em;">{{ unread_count }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="user-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </span>
+                                {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                        
+                        {% if current_user.products|length > 0 %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('seller_orders') }}">My Orders</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}"><i class="fa-solid fa-sign-in-alt"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}"><i class="fa-solid fa-user-plus"></i> Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <div class="container">
+            &copy; {{ 2025 }} Homemade Cosmetics Tutor & Marketplace. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+    // Real-time notification badge update with animation
+    function animateBadge(badge) {
+        badge.classList.add('notif-animate');
+        setTimeout(() => badge.classList.remove('notif-animate'), 500);
+    }
+    function updateNotifBadge() {
+        const badge = document.querySelector('.nav-link.position-relative .badge');
+        if (badge) {
+            fetch("/api/unread_notification_count")
+                .then(response => response.json())
+                .then(data => {
+                    const oldCount = parseInt(badge.textContent) || 0;
+                    if (data.count > 0) {
+                        if (oldCount !== data.count) {
+                            badge.textContent = data.count;
+                            animateBadge(badge);
+                        }
+                        badge.style.display = '';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                });
+        }
+    }
+    setInterval(updateNotifBadge, 5000); // Poll every 5 seconds
+    document.addEventListener('DOMContentLoaded', updateNotifBadge);
+    </script>
+</body>
+</html>

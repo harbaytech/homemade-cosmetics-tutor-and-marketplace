@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Product{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100" style="background: linear-gradient(120deg, #e0e7ff 60%, #f8fafc 100%);">
+    <div class="col-md-6">
+        <div class="card shadow-lg rounded-4 border-0 p-4">
+            <h2 class="text-center mb-4 fw-bold" style="letter-spacing:1px;"><i class="fas fa-box-open text-success me-2"></i>Upload Product</h2>
+            <form method="POST" action="{{ url_for('upload_product') }}" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-tag"></i></span>
+                        {{ form.name(class="form-control", placeholder="Enter product name") }}
+                    </div>
+                    {% for error in form.name.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-align-left"></i></span>
+                        {{ form.description(class="form-control", placeholder="Enter product description") }}
+                    </div>
+                    {% for error in form.description.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.image.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-image"></i></span>
+                        {{ form.image(class="form-control") }}
+                    </div>
+                    {% for error in form.image.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.whatsapp_link.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fab fa-whatsapp text-success"></i></span>
+                        {{ form.whatsapp_link(class="form-control", placeholder="Enter WhatsApp contact link") }}
+                    </div>
+                    {% for error in form.whatsapp_link.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-primary rounded-pill fw-bold py-2") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

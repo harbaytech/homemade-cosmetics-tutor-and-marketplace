@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Tutorial{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100" style="background: linear-gradient(120deg, #e0e7ff 60%, #f8fafc 100%);">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-lg rounded-4 border-0 p-4">
+            <h2 class="text-center mb-4 fw-bold" style="letter-spacing:1px;"><i class="fas fa-upload text-primary me-2"></i>Upload Tutorial</h2>
+            <form method="POST" action="{{ url_for('upload_tutorial') }}" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.title.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-heading"></i></span>
+                        {{ form.title(class="form-control", placeholder="Enter tutorial title") }}
+                    </div>
+                    {% for error in form.title.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.category.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
+                        {{ form.category(class="form-select") }}
+                    </div>
+                    {% for error in form.category.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-align-left"></i></span>
+                        {{ form.description(class="form-control", placeholder="Enter tutorial description") }}
+                    </div>
+                    {% for error in form.description.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label for="pdf_file" class="form-label fw-semibold"><i class="fas fa-file-pdf text-danger me-1"></i>PDF File</label>
+                    <input id="pdf_file" name="file" type="file" class="form-control" accept=".pdf">
+                    <small class="form-text text-muted">Upload a PDF file only. You can only upload one file or provide a YouTube link below.</small>
+                </div>
+                <div class="mb-3">
+                    <label for="video_file" class="form-label fw-semibold"><i class="fas fa-file-video text-info me-1"></i>Video File</label>
+                    <input id="video_file" name="video_file" type="file" class="form-control" accept="video/*">
+                    <small class="form-text text-muted">Upload a video file only (mp4, avi, mov, wmv, flv, mkv, webm). You can only upload one file or provide a YouTube link below.</small>
+                </div>
+                <div class="mb-3">
+                    {{ form.youtube_link.label(class="form-label fw-semibold") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fab fa-youtube text-danger"></i></span>
+                        {{ form.youtube_link(class="form-control", placeholder="Paste YouTube video link (optional)") }}
+                    </div>
+                    <small class="form-text text-muted">Or provide a YouTube link instead of uploading a file.</small>
+                    {% for error in form.youtube_link.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-primary rounded-pill fw-bold py-2") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
